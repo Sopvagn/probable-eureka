@@ -1,0 +1,63 @@
+public class User{
+    private String username;
+    private String password;
+    private String email;
+    
+    public User(String username, String password, String email){
+        username = this.username;
+        password = this.password;
+        email = this.email;
+    }
+    
+   public String getUsername(){
+       return username;
+   }
+   
+   public String getPassword(){
+       return password;
+   }
+   
+   public String getEmail(){
+       return email;
+   }
+   
+   public void setUsername(String newUsername){
+       boolean exists = false;
+       for(User user : userlist){
+           if(user.getUsername().equals(newUsername)){
+               exists = true;
+               return exists;
+           }
+           else{
+               username = newUsername;
+           }
+               
+       }
+   }
+   
+   public void setEmail(String newEmail){
+       boolean exists = false;
+       for(User user : userlist){
+           if(user.getEmail().equals(newEmail)){
+               exists = true;
+               return exists;
+           }
+           else{
+               email = newEmail;
+           }
+               
+       }
+   }
+   
+   public void setPassword(String newPassword){
+       boolean same = false;
+       if(newPassword.equals(password)){
+           same = true;
+           return same;
+       }
+       else{
+           password = newPassword;
+       }
+   }
+    
+}
