@@ -3,3 +3,4 @@
         String st = "";
         st = Getter.getEleverFromElevhem(hwdb, dormitory);
         jTextArea1.setText("Elever som tillhör " + dormitory + "\n" +st);
+
