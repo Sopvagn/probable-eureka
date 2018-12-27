@@ -1,0 +1,56 @@
+package Classes;
+
+import java.util.Arrays;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import oru.inf.InfDB;
+
+/**
+ *
+ * @author Kasper
+ */
+public class Validate {
+
+    private static InfDB hwdb;
+    
+public static boolean textEmpty(JTextField textfield) {
+        boolean empty = false;
+        if(textfield.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(textfield, "Rutan är tom");
+            textfield.requestFocus();
+            empty = true;
+        }
+        
+        return empty;
+    }
+    
+public static boolean textIsInt(JTextField textfield){
+        int sum;
+        try {
+            sum = Integer.parseInt(textfield.getText());
+        } catch(Exception exc) {
+            JOptionPane.showMessageDialog(textfield, "Rutan är inte integer");
+            textfield.setText("");
+            textfield.requestFocus();
+            return false;
+        }
+        
+        return true;
+    }
+
+public static boolean isPasswordCorrect(char[] input, String id) {
+    boolean isCorrect = true;
+    char[] correctPassword = Getter.getPassword(id, hwdb);
+
+    if (input.length != correctPassword.length) {
+        isCorrect = false;
+    } else {
+        isCorrect = Arrays.equals (input, correctPassword);
+    }
+
+    //Zero out the password.
+    Arrays.fill(correctPassword,'0');
+
+    return isCorrect;
+    }
+}
