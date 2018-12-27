@@ -1,0 +1,83 @@
+package Classes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import oru.inf.InfDB;
+import oru.inf.InfException;
+
+/**
+ *
+ * @author Kasper
+ */
+public class Getter {
+    public static String getUser(int id, InfDB hwdb){
+        String st = "";
+        
+        try{
+            st = hwdb.fetchSingle("select * from larare where LARAR_ID =" + id);
+            
+            return st;
+        }
+        catch(InfException e){
+            
+            JOptionPane.showMessageDialog(null, "Error1");
+            st = "Error1";
+            return st;
+        }
+    }
+    public static String getUsername(int id, InfDB hwdb){
+        String st = "";
+        try{
+            st = hwdb.fetchSingle("SELECT FORNAMN FROM LARARE where larar_id =" + id);
+            return st;
+        }
+        catch(InfException e){
+            JOptionPane.showMessageDialog(null, "Error2");
+            st = "Error2";
+            return st;
+        }
+    }
+    public static boolean getFirstnameTeacher(int id, InfDB hwdb){
+        
+        try{
+            hwdb.fetchSingle("select name from larare where LARAR_ID=" + id);
+            return true;
+        }
+        catch(Exception e){
+            
+            JOptionPane.showMessageDialog(null, "Error");
+            
+            return false;
+        }
+    }
+    public static char[] getPassword(String id, InfDB hwdb){
+        String st ="";
+        char[] c = null;
+        try{
+            st = hwdb.fetchSingle("select losenord from larare where larar_id=" + id);
+            c = st.toCharArray();
+            return c;
+        }
+        catch(InfException e){
+            JOptionPane.showMessageDialog(null, "Error2");
+            st = "Error3";
+            return c;
+        }
+    }
+    
+    public ArrayList<HashMap<String, String>> getElevFromElevhem(JComboBox jcb, InfDB hwdb){
+        String st = jcb.getSelectedItem().toString();
+        
+        try{
+            ArrayList<HashMap<String,String>> names = hwdb.fetchRows("select fornamn,efternamn from elev join sovsal on sovsal_ID = sovsal join elevhem on elevhem = elevhem_ID where elevhemsnamn = '" + jcb + "'");
+            return names;
+        }
+        
+        catch(InfException e){
+            System.out.println("Erro4");
+        }
+        return null;
+    }
+}
