@@ -4,3 +4,57 @@
         st = Getter.getEleverFromElevhem(hwdb, dormitory);
         jTextArea1.setText("Elever som tillhör " + dormitory + "\n" +st);
 
+        //Ny metod som ska vara i klassen getter
+        public static String getCourseAndTeacher(InfDB db, Date startDate, Date stopDate){
+        ArrayList<HashMap<String,String>> courses;
+        String st = "";
+        int index = 1;
+        
+        
+        
+         try{
+            courses = db.fetchRows("SELECT kursnamn,kursstart,kursslut FROM KURS join larare on KURSLARARE = LARAR_ID");
+            for(HashMap<String,String> course : courses){
+                String std = "";
+                DateFormat format = new SimpleDateFormat("yyyy"+ "-" + "mm" + "-" + "dd", Locale.ENGLISH);
+                std = course.get("KURSSTART");
+                Date startd = format.parse(std);
+                System.out.println(startd);
+                
+                String sld = "";
+                sld = course.get("KURSSLUT");
+                Date slutd = format.parse(sld);
+                System.out.println(slutd);
+                
+                if(startd.compareTo(startDate)<=0 && slutd.compareTo(stopDate)>=0){
+                    st += index++ + ". " + course.get("KURSNAMN") + " " + "\n";
+                }
+                else if (startd.compareTo(startDate)>0 && slutd.compareTo(stopDate)>=0){
+                    st += index++ + ". " + course.get("KURSNAMN") + " " + "\n";
+                }
+                //else if (std.compareTo(startDate))
+                
+                
+            }
+        }
+        catch(Exception e){
+             st = "Error";
+             System.out.println(e);
+        }
+        return st;
+    }
+    
+    //Metoden som skall köras under en knapp eller dylikt
+    String startDate = tf_startdatum.getText();
+        String stopDate = tf_slutDatum.getText();
+        String st ="";
+        DateFormat format = new SimpleDateFormat("yyyy"+ "-" + "mm" + "-" + "dd", Locale.ENGLISH);
+        try{ 
+            Date startD = format.parse(startDate);
+            Date slutD = format.parse(stopDate);
+            st = Getter.getCourseAndTeacher(hwdb, startD, slutD);
+            jTextArea1.setText(st + "\n");
+        }
+        catch(Exception e){
+            
+        }
