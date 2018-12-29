@@ -1,0 +1,8 @@
+try {
+            String path = System.getProperty("user.dir") + "/HOGDB.FDB";
+            System.out.println("Current Path: " + path);
+            hwdb = new InfDB(path);
+        }
+        catch (InfException e) {
+            System.out.println("Failed to connect to database");
+        }
