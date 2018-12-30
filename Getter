@@ -179,4 +179,20 @@ public class Getter {
         }
         return st;
     }
+    
+    public static String getPrefektDormitory(InfDB db, String dormitory){
+        HashMap<String, String> prefekt;
+        String st = "";
+        
+        try{
+            prefekt = db.fetchRow("SELECT FORNAMN, EFTERNAMN FROM ELEV JOIN ELEVHEM ON PREFEKT = ELEV_ID WHERE ELEVHEMSNAMN = " + "'" + dormitory + "'");
+            for(int i = 1; i<prefekt.size(); i++){
+                st += prefekt.get("FORNAMN") + " " + prefekt.get("EFTERNAMN");
+            }
+        }
+        catch(Exception e){
+            
+        }
+        return st;
+    }
 }
