@@ -4,14 +4,9 @@
  * and open the template in the editor.
  */
 package Classes;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import oru.inf.InfDB;
 import oru.inf.InfException;
@@ -153,17 +148,23 @@ public class Getter {
         String st = "";
         
         try{
-            student = db.fetchRows("SELECT Kursnamn FROM Kurs JOIN Registrerad_pa on Registrerad_pa.Kurs_id = Kurs.Kurs_id JOIN Elev on Elev.Elev-id = Registrerad_pa.Elev_id"
-                    + "WHERE Fornamn = " + "'" + firstname + "'" + " AND Efternamn = " + "'" + surname + "'");
-            st = firstname + "är registrerad på kurserna:" + "\n";
+            student = db.fetchRows("SELECT KURSNAMN FROM ELEV JOIN REGISTRERAD_PA ON ELEV.ELEV_ID = REGISTRERAD_PA.ELEV_ID JOIN KURS ON REGISTRERAD_PA.KURS_ID = KURS.KURS_ID WHERE"
+                    + " FORNAMN = '" + firstname + 
+                    "'"  + " AND EFTERNAMN = '" + surname + "'");
+            st = firstname + " " + surname + " " + "är registrerad på följande kurser:" + "\n";
             for(HashMap<String, String> stt : student){
                 st += stt.get("KURSNAMN") + "\n";
             }
             
         }
-        catch(Exception e){
+        catch(InfException e){
             System.out.println("Error student course");
         }
         return st;
+    }
+    
+    public static String getCourseGrade(InfDB db, String firstname, String surname, String course){
+        ArrayList<HashMap<String, String>> student;
+        
     }
 }
