@@ -164,7 +164,19 @@ public class Getter {
     }
     
     public static String getCourseGrade(InfDB db, String firstname, String surname, String course){
-        ArrayList<HashMap<String, String>> student;
+        HashMap<String, String> student;
+        String st = "";
         
+        try{
+            student = db.fetchRow("SELECT KURSNAMN, KURSBETYG FROM KURS JOIN HAR_BETYG_I ON HAR_BETYG_I.KURS_ID = KURS.KURS_ID JOIN ELEV ON ELEV.ELEV_ID = HAR_BETYG_I.ELEV_ID"
+                    + " WHERE ELEV.FORNAMN = " + "'" + firstname + "'" + " AND ELEV.EFTERNAMN = " + "'" + surname + "'" + " AND KURS.KURSNAMN = " + "'" + course + "'");
+            for(int i = 1; i< student.size();i++){
+                st += "Kurs: " + student.get("KURSNAMN") + " Betyg: " + student.get("KURSBETYG");
+            }
+        }
+        catch(Exception e){
+            st = "Error betyg, elev.";
+        }
+        return st;
     }
 }
