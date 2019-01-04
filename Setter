@@ -1,0 +1,61 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Classes;
+
+import oru.inf.InfDB;
+import oru.inf.InfException;
+
+/**
+ *
+ * @author Kasper
+ */
+public class Setter {
+    private static InfDB hwdb;
+    
+    
+    public static void updateStudentFirstname(InfDB db, int id, String nName){
+        
+        try{
+        db.update("UPDATE ELEV SET FORNAMN = '" + nName +  "' WHERE ELEV_ID = " + id);
+        System.out.println("Bra");
+        }
+        
+        catch(Exception e){
+            System.out.println("AJajaj");
+        }
+        
+    }
+    
+    public static void updateStudentSurname(InfDB db, int id, String nName){
+        try{
+            db.update("UPDATE ELEV SET EFTERNAMN = '" + nName +  "' WHERE ELEV_ID = " + id);
+            System.out.println("Success");
+        }
+        catch(InfException e){
+            System.out.println("Something went wrong");
+        }   
+    }
+    
+    public static void updateStudentSovsal(InfDB db, int id, int nSovsal){
+        try{
+            db.update("UPDATE ELEV SET SOVSAL = '" + nSovsal +  "' WHERE ELEV_ID = " + id);
+        }
+        catch(InfException e){
+            System.out.println("Something went wrong.");
+        }
+    }
+    
+    public static void upDateDormitoryPoints(InfDB db, String d, int p){
+        try{
+            db.update("UPDATE ELEVHEM SET HUSPOANG = "+ p + " WHERE ELEVHEMSNAMN = '" + d + "'");
+        }
+        catch(InfException e){
+            System.out.println("Something went wrong");
+        }
+    }
+    
+    
+}
