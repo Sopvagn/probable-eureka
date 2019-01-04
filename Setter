@@ -5,6 +5,8 @@
  */
 package Classes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import oru.inf.InfDB;
 import oru.inf.InfException;
 
@@ -48,14 +50,52 @@ public class Setter {
         }
     }
     
-    public static void upDateDormitoryPoints(InfDB db, String d, int p){
+    public static int upDateDormitoryPoints(InfDB db, String d, int p){
+        int np = 0;
         try{
-            db.update("UPDATE ELEVHEM SET HUSPOANG = "+ p + " WHERE ELEVHEMSNAMN = '" + d + "'");
+            String ep = db.fetchSingle("SELECT HUSPOANG FROM ELEVHEM WHERE ELEVHEMSNAMN = '" + d + "'");
+            np = Integer.parseInt(ep) + p;
+            db.update("UPDATE ELEVHEM SET HUSPOANG = "+ np + " WHERE ELEVHEMSNAMN = '" + d + "'");
+            
         }
         catch(InfException e){
             System.out.println("Something went wrong");
         }
+        return np;
     }
     
+    public static void updateGradeOnStudent(InfDB db, String firstname, String surname, String grade){
+            
+        ArrayList<HashMap<String, String>> student;
+        try{
+            //student = db.fetchRows("SELECT ELEV_ID, KURS_ID, KURSBETYG FROM ELEV JOIN REGISTRERAD_PA ON ELEV.ELEV_ID = REGISTRERAD_PA.ELEV_ID JOIN HAR_BETYG_I ON HAR_BETYG_I.ELEV_ID = "
+            //        + "ELEV.ELEV_ID WHERE FORNAMN = '" + firstname + "' AND EFTERNAMN = '" + surname + "'");
+            //for(HashMap<String,String> thing : student){
+            //    if(thing.get(""))
+            
+            
+            }
+            
+        
+        catch(Exception e){
+        
+        }
+    }
     
+    public static void upDatePassword(InfDB db, String existingPass, String newPass){
+        
+        try{
+            existingPass = db.fetchSingle("SELECT LOSENORD FROM LARARE WHERE LARAR_ID =" + Huvudfönster.id);
+            
+        }
+        catch(Exception e){
+            
+        }
+    }
+    
+        
+        
 }
+    
+    
+
