@@ -17,6 +17,15 @@ import oru.inf.InfException;
 public class Setter {
     private static InfDB hwdb;
     
+    public static void updateStudentID(InfDB db, int gid, int nid){
+        try{
+            db.update("UPDATE ELEV SET ELEV_ID = " + nid + "WHERE ELEV_ID =" + gid);
+        }
+        catch(InfException e){
+            System.out.println("Error update ID");
+        }
+    }
+    
     
     public static void updateStudentFirstname(InfDB db, int id, String nName){
         
@@ -53,8 +62,8 @@ public class Setter {
     public static int upDateDormitoryPoints(InfDB db, String d, int p){
         int np = 0;
         try{
-            String ep = db.fetchSingle("SELECT HUSPOANG FROM ELEVHEM WHERE ELEVHEMSNAMN = '" + d + "'");
-            np = Integer.parseInt(ep) + p;
+            String newpoint = db.fetchSingle("SELECT HUSPOANG FROM ELEVHEM WHERE ELEVHEMSNAMN = '" + d + "'");
+            np = Integer.parseInt(newpoint) + p;
             db.update("UPDATE ELEVHEM SET HUSPOANG = "+ np + " WHERE ELEVHEMSNAMN = '" + d + "'");
             
         }
@@ -82,15 +91,81 @@ public class Setter {
         }
     }
     
-    public static void upDatePassword(InfDB db, String existingPass, String newPass){
+    public static void upDatePassword(InfDB db, String newPass){
         
         try{
-            existingPass = db.fetchSingle("SELECT LOSENORD FROM LARARE WHERE LARAR_ID =" + Huvudfönster.id);
+            db.update("UPDATE LARARE SET LOSENORD = '" + newPass + "' WHERE LARAR_ID = " + Huvudfönster.id);
+            System.out.println("Password is changed");
+        }
+        catch(Exception e){
+            
+        }
+    }
+    
+    public static void addElev(InfDB db, String firstname, String surname,int sovsal){
+        int id;
+        try{
+            id = Integer.parseInt(db.fetchSingle("SELECT * FROM ELEV") + 1);
+            db.insert("INSERT INTO ELEV VALUES(" + id + ", '" + firstname +  "' , '" + surname + "' , " + sovsal + ")");
+            
+            
+        }
+        catch(InfException e){
+                
+        }   
+    }
+    
+    public static void addTeacher(InfDB db, String firstname, String surname, String pass, String admin){
+        int id;
+        try{
+            id = Integer.parseInt(db.fetchSingle("SELECT * FROM LARARE") + 1);
+            db.insert("INSERT INTO LARARE VALUES(" + id + ", '" + firstname +  "' , '" + surname + "' , " + pass + "' , '" + admin + "' )");
+            
+            
+        }
+        catch(InfException e){
+                
+        }   
+    }
+    public static void giveAdmin(InfDB db, int id, String admin){
+        try{
+            db.update("UPDATE LARARE SET ADMINISTRATOR = '" + admin + "' WHERE LARAR_ID =" + id);
+        }
+        catch(Exception e){
+            
+        }
+    }
+    public static void addCourse(InfDB db, int id, String courseName, String courseStart, String courseEnd, int teacherID, int subjectBelonging){
+        try{
+            db.insert("INSERT INTO KURS VALUES(" + id + ", '" + courseName + "', '" + courseStart + "', '" + courseEnd + "', " + teacherID + ", " + subjectBelonging);
             
         }
         catch(Exception e){
             
         }
+    }
+    
+    public static void updateTeacherFirstname(InfDB db, int id, String nName){
+        
+        try{
+        db.update("UPDATE LARARE SET FORNAMN = '" + nName +  "' WHERE LARA_ID = " + id);
+        System.out.println("Bra");
+        }
+        
+        catch(Exception e){
+            System.out.println("Error updateTeacherfirstname");
+        }
+        
+    }
+    
+    public static void updateTeacherSurname(InfDB db, int id, String nName){
+        try{
+            db.update("UPDATE LARARE SET EFTERNAMN = '" + nName +  "' LARAR_ID = " + id);
+            System.out.println("Success");
+        }
+        catch(InfException e){
+            System.out.println("Error in updateTeacherSurname");
+        }   
     }
     
         
