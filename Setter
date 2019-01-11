@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Classes;
+package hogwarts;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import oru.inf.InfDB;
 import oru.inf.InfException;
 
@@ -14,32 +12,18 @@ import oru.inf.InfException;
  *
  * @author Kasper
  */
-public class Setter {
-    private static InfDB hwdb;
-    
-    public static void updateStudentID(InfDB db, int gid, int nid){
+public class Setters {
+    //Uppdaterar en students förnamn efter elev_id, det nya förnamnet blir parametern nName
+    public static void updateStudentFirstname(InfDB db, int id, String nName){
         try{
-            db.update("UPDATE ELEV SET ELEV_ID = " + nid + "WHERE ELEV_ID =" + gid);
+            db.update("UPDATE ELEV SET FORNAMN = '" + nName +  "' WHERE ELEV_ID = " + id);
+            System.out.println("Bra");
         }
         catch(InfException e){
-            System.out.println("Error update ID");
-        }
+            System.out.println(e);
+        }   
     }
-    
-    
-    public static void updateStudentFirstname(InfDB db, int id, String nName){
-        
-        try{
-        db.update("UPDATE ELEV SET FORNAMN = '" + nName +  "' WHERE ELEV_ID = " + id);
-        System.out.println("Bra");
-        }
-        
-        catch(Exception e){
-            System.out.println("AJajaj");
-        }
-        
-    }
-    
+    //Uppdaterar en students efternamn efter elev_id, det nya efternamnet blir parametern nName
     public static void updateStudentSurname(InfDB db, int id, String nName){
         try{
             db.update("UPDATE ELEV SET EFTERNAMN = '" + nName +  "' WHERE ELEV_ID = " + id);
@@ -49,128 +33,96 @@ public class Setter {
             System.out.println("Something went wrong");
         }   
     }
-    
+    //Uppdaterar sovsal för angiven student efter elev_id, den nya sovsalen blir parametern nSovsal
     public static void updateStudentSovsal(InfDB db, int id, int nSovsal){
         try{
             db.update("UPDATE ELEV SET SOVSAL = '" + nSovsal +  "' WHERE ELEV_ID = " + id);
         }
         catch(InfException e){
-            System.out.println("Something went wrong.");
+            System.out.println(e);
         }
     }
-    
-    public static int upDateDormitoryPoints(InfDB db, String d, int p){
-        int np = 0;
+    //Uppdaterar all information om en elev efter elev_id, all information får nya värden av parametrarna
+    public static void updateElev(InfDB db, int elevID, String firstname, String surname, int sovsal_id) {
+        try {
+            db.update("UPDATE ELEV SET FORNAMN = '" + firstname + "', EFTERNAMN = '" + surname + "', SOVSAL = " + 
+            sovsal_id + " WHERE ELEV_ID = " + elevID);
+        }
+        catch(InfException e) {
+            System.out.println(e);
+        }
+    }
+    //Uppdaterar ett elevhems huspoäng efter elevhemsnamn, den nya poängen blir gamla värdet plus parametern changepoint
+    public static int updateDormitoryPoints(InfDB db, String dormitory, int changepoint){
+        int newpoint = 0;
         try{
-            String newpoint = db.fetchSingle("SELECT HUSPOANG FROM ELEVHEM WHERE ELEVHEMSNAMN = '" + d + "'");
-            np = Integer.parseInt(newpoint) + p;
-            db.update("UPDATE ELEVHEM SET HUSPOANG = "+ np + " WHERE ELEVHEMSNAMN = '" + d + "'");
-            
+            int existingPoint = Integer.parseInt(db.fetchSingle("SELECT HUSPOANG FROM ELEVHEM WHERE ELEVHEMSNAMN = '" + dormitory + "'"));
+            newpoint = existingPoint + changepoint;
+            db.update("UPDATE ELEVHEM SET HUSPOANG = "+ newpoint + " WHERE ELEVHEMSNAMN = '" + dormitory + "'");    
         }
         catch(InfException e){
-            System.out.println("Something went wrong");
+            System.out.println(e);
         }
-        return np;
+        return newpoint;
     }
-    
-    public static void updateGradeOnStudent(InfDB db, String firstname, String surname, String grade){
-            
-        ArrayList<HashMap<String, String>> student;
+    //Uppdaterar lösenordet för angiven lärare efter lärar_id, det nya lösenordet får värdet från parametern newPass
+    public static void upDatePassword(InfDB db, char[] newPass, int id){
         try{
-            //student = db.fetchRows("SELECT ELEV_ID, KURS_ID, KURSBETYG FROM ELEV JOIN REGISTRERAD_PA ON ELEV.ELEV_ID = REGISTRERAD_PA.ELEV_ID JOIN HAR_BETYG_I ON HAR_BETYG_I.ELEV_ID = "
-            //        + "ELEV.ELEV_ID WHERE FORNAMN = '" + firstname + "' AND EFTERNAMN = '" + surname + "'");
-            //for(HashMap<String,String> thing : student){
-            //    if(thing.get(""))
-            
-            
+            String st ="";
+            for(char c : newPass){
+                st +=c;
             }
-            
-        
-        catch(Exception e){
-        
-        }
-    }
-    
-    public static void upDatePassword(InfDB db, String newPass){
-        
-        try{
-            db.update("UPDATE LARARE SET LOSENORD = '" + newPass + "' WHERE LARAR_ID = " + Huvudfönster.id);
+            db.update("UPDATE LARARE SET LOSENORD = '" + st + "' WHERE LARAR_ID = " + id);
             System.out.println("Password is changed");
         }
-        catch(Exception e){
-            
+        catch(InfException e){
+            System.out.print(e);
         }
     }
-    
+    //Lägger till en ny elev i databasen
     public static void addElev(InfDB db, String firstname, String surname,int sovsal){
-        int id;
         try{
-            id = Integer.parseInt(db.fetchSingle("SELECT * FROM ELEV") + 1);
-            db.insert("INSERT INTO ELEV VALUES(" + id + ", '" + firstname +  "' , '" + surname + "' , " + sovsal + ")");
-            
-            
+            int id = Integer.parseInt(db.fetchSingle("SELECT MAX (ELEV_ID) FROM ELEV")) + 1;
+            db.insert("INSERT INTO ELEV values(" + id + ", '" + firstname + "', '" + surname + "', " + sovsal + ")");   
         }
         catch(InfException e){
-                
+            System.out.println(e);
         }   
     }
-    
-    public static void addTeacher(InfDB db, String firstname, String surname, String pass, String admin){
-        int id;
+    //Ger ett betyg till en elev efter för- och efternamn samt vilken kurs, kursens betyg blir parametern grade
+    public static void setGrade(InfDB db, String firstname, String surname, String grade, String courseName){
+        int studentID = Integer.parseInt(Getter.getStudentID(db, firstname, surname));
+        int courseID = Getter.getCourseID(db, courseName);
         try{
-            id = Integer.parseInt(db.fetchSingle("SELECT * FROM LARARE") + 1);
-            db.insert("INSERT INTO LARARE VALUES(" + id + ", '" + firstname +  "' , '" + surname + "' , " + pass + "' , '" + admin + "' )");
-            
-            
+            db.insert("INSERT INTO HAR_BETYG_I VALUES(" + studentID + ", " + courseID + ", '" + grade + "')");
+            System.out.println("Grade is updated");
         }
         catch(InfException e){
-                
-        }   
-    }
-    public static void giveAdmin(InfDB db, int id, String admin){
-        try{
-            db.update("UPDATE LARARE SET ADMINISTRATOR = '" + admin + "' WHERE LARAR_ID =" + id);
-        }
-        catch(Exception e){
-            
+            System.out.println(e);
         }
     }
-    public static void addCourse(InfDB db, int id, String courseName, String courseStart, String courseEnd, int teacherID, int subjectBelonging){
+     //Lägger till lärare
+    public static void addLärare(InfDB db, String firstname, String surname, String pass, char admin){
         try{
-            db.insert("INSERT INTO KURS VALUES(" + id + ", '" + courseName + "', '" + courseStart + "', '" + courseEnd + "', " + teacherID + ", " + subjectBelonging);
-            
-        }
-        catch(Exception e){
-            
-        }
-    }
-    
-    public static void updateTeacherFirstname(InfDB db, int id, String nName){
-        
-        try{
-        db.update("UPDATE LARARE SET FORNAMN = '" + nName +  "' WHERE LARA_ID = " + id);
-        System.out.println("Bra");
-        }
-        
-        catch(Exception e){
-            System.out.println("Error updateTeacherfirstname");
-        }
-        
-    }
-    
-    public static void updateTeacherSurname(InfDB db, int id, String nName){
-        try{
-            db.update("UPDATE LARARE SET EFTERNAMN = '" + nName +  "' LARAR_ID = " + id);
-            System.out.println("Success");
+            int id = Integer.parseInt(db.fetchSingle("SELECT MAX(LARAR_ID) FROM LARARE")) + 1;
+            db.insert("INSERT INTO LARARE values(" + id + ", '" + firstname + "', '" + surname + "', '" + pass + "', '" + admin +"')");
         }
         catch(InfException e){
-            System.out.println("Error in updateTeacherSurname");
-        }   
+            System.out.println(e);
+        }
     }
-    
-        
-        
+    //Uppdaterar betyg efter för- och efternamn på angiven kurs, det nya betyget blir parametern grade
+    public static void updateGrade(InfDB db, String firstname, String surname, String grade, String course){
+        int studentID = Integer.parseInt(Getter.getStudentID(db, firstname, surname));
+        int courseID = Getter.getCourseID(db, course);
+        try{
+            db.update("UPDATE HAR_BETYG_I SET KURSBETYG ='" + grade + "' WHERE ELEV_ID = " + studentID + " AND KURS_ID =" + courseID);
+            System.out.println("Grade is updated");
+        }
+        catch(InfException e){
+            System.out.println(e);
+        }
+    }
 }
+   
     
-    
-
