@@ -1,5 +1,0 @@
-//elevfönster
-public Studentfönster(InfDB hogdb) {
-        hwdb = hogdb;
-        initComponents();
-    }
