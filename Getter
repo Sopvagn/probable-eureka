@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Classes;
-
+package hogwarts;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
 import oru.inf.InfDB;
@@ -13,40 +13,115 @@ import oru.inf.InfException;
 
 /**
  *
- * @author Kasper
+ * @author Kasper, Elias
  */
 public class Getter {
-    private static InfDB hwdb;
-    
-    public static String getUser(int id, InfDB hwdb){
-        String st = "";
-        
+    //Hämtar huspoäng för angivet elevhem, returnerar huspoäng som en int samt printar huspoäng till output
+    public static int getDormitoryPoints(InfDB db, String dormitory){
+        int points = 0;
         try{
-            st = hwdb.fetchSingle("select * from larare where LARAR_ID =" + id);
-            
-            return st;
+            points = Integer.parseInt(db.fetchSingle("SELECT HUSPOANG FROM ELEVHEM WHERE ELEVHEMSNAMN = '" + dormitory + "'"));
         }
         catch(InfException e){
-            
-            JOptionPane.showMessageDialog(null, "Error1");
-            st = "Error1";
-            return st;
+            System.out.println(e);
         }
+        System.out.println(points);
+        return points;
     }
-    public static String getUsername(int id, InfDB hwdb){
-        String st = "";
+    //Hämtar förnamn på en elev efter angivet elev_id, returnerar förnamnet som en sträng
+    public static String getStudentFirstname(InfDB db, int id){
+        String st ="";
         try{
-            st = hwdb.fetchSingle("SELECT FORNAMN FROM LARARE where larar_id =" + id);
-            return st;
+            st = db.fetchSingle("SELECT FORNAMN FROM ELEV WHERE ELEV_ID =" + id);
         }
         catch(InfException e){
-            JOptionPane.showMessageDialog(null, "Error2");
-            st = "Error2";
-            return st;
+            System.out.print(e);
         }
+        return st;
     }
-    
-    public static String getUserID(InfDB hwdb, String firstname, String surname){
+    //Hämtar efternamn på en elev efter angivet elev_id, returnerar efternamnet som en sträng
+    public static String getStudentSurname(InfDB db, int id){
+        String st ="";
+        try{
+            st = db.fetchSingle("SELECT EFTERNAMN FROM ELEV WHERE ELEV_ID =" + id);
+        }
+        catch(InfException e){
+            System.out.println(e);
+        }
+        return st;
+    }
+    //Hämtar elev_id på en elev efter angivet för- och efternamn, returnerar id:et som en sträng
+    public static String getStudentID(InfDB db, String firstname, String surname){
+        String id ="";
+        try{
+            id = db.fetchSingle("SELECT ELEV_ID FROM ELEV WHERE FORNAMN = '" + firstname + "' AND EFTERNAMN = '" + surname + "'");
+            System.out.println("Student id : " + id);
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        return id;
+    }
+    //Hämtar förnamn på en lärare efter angivet id, returnerar förnamnet som en sträng
+    public static String getFirstnameTeacher(InfDB db, int id){
+        String name ="";
+        try{
+            name = db.fetchSingle("SELECT FORNAMN FROM LARARE WHERE LARAR_ID=" + id);  
+        }
+        catch(Exception e){
+            System.out.println(e); 
+        }
+        return name;
+    }
+    //Hämtar efternamn på en lärare efter angivet id, returnerar efternamnet som en sträng
+    public static String getSurnameTeacher(InfDB db, int id){
+        String name ="";
+        try{
+            name = db.fetchSingle("SELECT EFTERNAMN FROM LARARE WHERE LARAR_ID=" + id);
+            
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        return name;
+    }
+    //Hämtar lösenord från en lärare efter angivet id, returnerar lösenordet som en char[]
+    public static char[] getPassword(String id, InfDB hwdb){
+        String st ="";
+        char[] c = null;
+        try{
+            st = hwdb.fetchSingle("select losenord from larare where larar_id=" + id);
+            c = st.toCharArray();
+        }
+        catch(InfException e){
+            System.out.println(e);
+            
+        }
+        return c;
+    }
+    //Hämtar alla elever från ett elevhem efter angivet elevhemsnamn, returnerar eleverna som en sträng
+    public static String getEleverFromElevhem(InfDB db, String dormitory) {
+        ArrayList<HashMap<String,String>> students;
+        String st = "";
+        int index = 1;
+        HashMap<String, String> prefekt;
+        try{
+            students = db.fetchRows("SELECT fornamn,efternamn FROM ELEV join sovsal on sovsal_ID = sovsal join elevhem on elevhem = elevhem_ID where elevhemsnamn = '" + dormitory + "'");
+            for(HashMap<String,String> elev : students){
+                st += index++ + ". " + elev.get("FORNAMN") + " " + elev.get("EFTERNAMN") + "\n";
+            }
+            prefekt = db.fetchRow("SELECT FORNAMN, EFTERNAMN FROM ELEV JOIN ELEVHEM ON PREFEKT = ELEV_ID WHERE ELEVHEMSNAMN = " + "'" + dormitory + "'");
+            for(int i =0; i < 1; i++){
+                st += "\n" + "\n" + dormitory + "s" + " prefekt är " + prefekt.get("FORNAMN") + " " + prefekt.get("EFTERNAMN");
+            }
+        }
+        catch(InfException e){
+            System.out.println("Error");
+        }
+        return st;
+    }
+    //Hämtar en lärares lärar_id efter angivet för- och efternamn, returnerar id:et som en sträng
+    public static String getTeacherID(InfDB hwdb, String firstname, String surname){
         String id ="";
         try{
             id = hwdb.fetchSingle("SELECT LARAR_ID FROM LARARE WHERE FORNAMN = " + "'" + firstname + "'" + " AND EFTERNAMN = " + "'" + surname + "'");
@@ -58,55 +133,8 @@ public class Getter {
         }
         return id;
     }
-            
-    public static boolean getFirstnameTeacher(int id, InfDB hwdb){
-        
-        try{
-            hwdb.fetchSingle("select name from larare where LARAR_ID=" + id);
-            return true;
-        }
-        catch(Exception e){
-            
-            JOptionPane.showMessageDialog(null, "Error");
-            
-            return false;
-        }
-    }
-    public static char[] getPassword(String id, InfDB hwdb){
-        String st ="";
-        char[] c = null;
-        try{
-            st = hwdb.fetchSingle("select losenord from larare where larar_id=" + id);
-            c = st.toCharArray();
-            return c;
-        }
-        catch(InfException e){
-            JOptionPane.showMessageDialog(null, "Error2");
-            st = "Error2";
-            return c;
-        }
-    }
-    
-    public static String getEleverFromElevhem(InfDB db, String dormitory) {
-        ArrayList<HashMap<String,String>> students;
-        String st = "";
-        int index = 1;
-        
-        
-        try{
-            students = db.fetchRows("SELECT fornamn,efternamn FROM ELEV join sovsal on sovsal_ID = sovsal join elevhem on elevhem = elevhem_ID where elevhemsnamn = '" + dormitory + "'");
-            for(HashMap<String,String> elev : students){
-                st += index++ + ". " + elev.get("FORNAMN") + " " + elev.get("EFTERNAMN") + "\n";
-            }
-        }
-        catch(InfException e){
-            System.out.println("Error3");
-            st ="Error";
-        }
-        return st;
-    }
-    
-    public static String getCourseAndTeacher(InfDB db, String startDate, String stopDate, String firstname, String surname){
+    //Hämtar alla kurser en lärare har haft mellan två datum efter angivet för och-efternamn, startdatum och slutdatum, returnerar kurserna som en sträng
+    public static String getCourseAndTeacher(InfDB db, String firstname, String surname, String startDate, String stopDate){
         ArrayList<HashMap<String,String>> courses;
         String st = "";
 
@@ -116,16 +144,16 @@ public class Getter {
             + " and KURSSLUT <= " + "'" + stopDate + "'");
             for(HashMap<String,String> course : courses){
                 st += course.get("KURSNAMN") + " from " + course.get("KURSSTART") + " to " + course.get("KURSSLUT") + "\n";
-                
+
             }
         }
         catch(Exception e){
              st = "Error";
-             System.out.println(e);
+             System.out.println("failed to get something");
         }
         return st;
     }
-    
+    //Hämtar ställningen i elevhemspokalen, returnerar ställningen som en sträng
     public static String getElevhemspokalen(InfDB db){
         ArrayList<HashMap<String, String>> pokal;
         String st = "";
@@ -142,7 +170,7 @@ public class Getter {
         }
         return st;
     }
-    
+    //Hämtar en kurser en elev är registrerad på efter angivet för- och efternamn, returnerar kurserna som en sträng
     public static String getCourseAndStudent(InfDB db, String firstname, String surname){
         ArrayList<HashMap<String, String>> student;
         String st = "";
@@ -162,24 +190,7 @@ public class Getter {
         }
         return st;
     }
-    
-    public static String getCourseGrade(InfDB db, String firstname, String surname, String course){
-        HashMap<String, String> student;
-        String st = "";
-        
-        try{
-            student = db.fetchRow("SELECT KURSNAMN, KURSBETYG FROM KURS JOIN HAR_BETYG_I ON HAR_BETYG_I.KURS_ID = KURS.KURS_ID JOIN ELEV ON ELEV.ELEV_ID = HAR_BETYG_I.ELEV_ID"
-                    + " WHERE ELEV.FORNAMN = " + "'" + firstname + "'" + " AND ELEV.EFTERNAMN = " + "'" + surname + "'" + " AND KURS.KURSNAMN = " + "'" + course + "'");
-            for(int i = 1; i< student.size();i++){
-                st += "Kurs: " + student.get("KURSNAMN") + " Betyg: " + student.get("KURSBETYG");
-            }
-        }
-        catch(Exception e){
-            st = "Error betyg, elev.";
-        }
-        return st;
-    }
-    
+    //Hämtar prefekt för ett elevhem efter angivet elevhemsnamn, returnerar prefektets namn som en sträng
     public static String getPrefektDormitory(InfDB db, String dormitory){
         HashMap<String, String> prefekt;
         String st = "";
@@ -190,9 +201,126 @@ public class Getter {
                 st += prefekt.get("FORNAMN") + " " + prefekt.get("EFTERNAMN");
             }
         }
-        catch(Exception e){
-            
+        catch(InfException e){
+            System.out.println(e);
         }
         return st;
+    }
+    //Hämtar betyg för en kurs för angiven elev, returnerar betyget som en sträng
+    public static String getCourseGrade(InfDB db, String firstname, String surname){
+        HashMap<String, String> kurs;
+        String st = "";
+
+        try{
+            kurs = db.fetchRow("SELECT KURSNAMN, KURSBETYG FROM KURS JOIN HAR_BETYG_I ON HAR_BETYG_I.KURS_ID = KURS.KURS_ID JOIN ELEV ON ELEV.ELEV_ID = HAR_BETYG_I.ELEV_ID"
+                    + " WHERE ELEV.FORNAMN = " + "'" + firstname + "'" + " AND ELEV.EFTERNAMN = " + "'" + surname + "'");
+
+            for(int i = 1; i< kurs.size();i++){
+                st += "Kurs: " + kurs.get("KURSNAMN") + " Betyg: " + kurs.get("KURSBETYG");
+            }
+            if(st.isEmpty()){
+                st = "Saknar betyg";
+            }
+        }
+        catch(InfException e){
+            System.out.println(e);
+        }
+        return st;
+    }
+    //Hämtar betyg för en kurs för angiven elev efter kurs_id, returnerar betyget som en sträng
+    public static String getCourseGrade1(InfDB db, String firstname, String surname, int courseID){
+        int studentID = 0;
+        String grade = null;
+        
+        try{
+            studentID = Integer.parseInt(Getter.getStudentID(db, firstname, surname));
+            grade = db.fetchSingle("SELECT KURSBETYG FROM HAR_BETYG_I WHERE ELEV_ID = " + studentID + " AND KURS_ID = " + courseID);
+            
+        }
+        catch(InfException e){
+            System.out.println(e);
+        }
+        return grade;
+     
+    }
+    //Hämtar alla elever som är registrerade på skolan, returnerar alla elever i en ArrayList
+    public static ArrayList<HashMap<String,String>> getAllStudentsList(InfDB db) {
+        ArrayList<HashMap<String,String>> elevlista = null;
+        try{
+             elevlista = db.fetchRows("SELECT * FROM ELEV");
+        }
+        catch(InfException e) {
+            System.out.println(e);
+        }
+        return elevlista;
+    }
+    //Hämtar alla sovsalar på skolan, returnerar sovalarna i en ArrayList
+    public static ArrayList<HashMap<String, String>> getAllBedrooms(InfDB db){
+        ArrayList<HashMap<String, String>> sovsalslista = null;
+        try{
+            sovsalslista = db.fetchRows("SELECT SOVSAL_ID from SOVSAL");
+        }
+        catch(InfException e){
+            System.out.println(e);
+        }   
+        return sovsalslista;
+    }
+    //Hämtar alla elevhem på skolan, returnerar alla elevhemsnamn i en ArrayList
+    public static ArrayList<HashMap<String, String>> getAllElevhemList(InfDB db) {
+        ArrayList<HashMap<String,String>> elevhemslista = null;
+        try{
+            elevhemslista = db.fetchRows("SELECT ELEVHEMSNAMN FROM ELEVHEM");
+            }
+        catch(InfException e){
+            System.out.println(e);
+        }
+
+        return elevhemslista;
+    }
+    //Hämtar alla kurser en elev är registrerad på, returnerar kurserna som en ArrayList
+    public static ArrayList<HashMap<String,String>> getStudentCourses(InfDB db,String firstname, String surname) {
+        ArrayList<HashMap<String,String>> courses = null;
+        try{
+        courses = db.fetchRows("SELECT KURS.KURS_ID, KURSNAMN FROM ELEV JOIN REGISTRERAD_PA ON ELEV.ELEV_ID = REGISTRERAD_PA.ELEV_ID JOIN KURS ON REGISTRERAD_PA.KURS_ID = KURS.KURS_ID WHERE FORNAMN = '" + firstname + 
+                    "'"  + " AND EFTERNAMN = '" + surname + "'");
+        }
+        catch(InfException e)
+        {
+            System.out.println(e);
+        }
+        return courses;
+    }
+    //Hämtar alla studenter som är registrerade på minst en kurs, returnerar studenterna som en ArrayList
+    public static ArrayList<HashMap<String,String>> getStudentIsActive(InfDB db) {
+        ArrayList<HashMap<String,String>> studentActiveList = null;
+        try {
+             studentActiveList = db.fetchRows("SELECT DISTINCT(ELEV.ELEV_ID),FORNAMN,EFTERNAMN FROM ELEV JOIN REGISTRERAD_PA ON ELEV.ELEV_ID = REGISTRERAD_PA.ELEV_ID");
+        } 
+        catch(InfException e){
+            System.out.println(e);
+        }
+        return studentActiveList;
+    }
+    //Hämtar kurs_id efter angivet kursnamn, reutnerar kurs_id som en int
+    public static int getCourseID(InfDB db, String courseName){
+        int courseID = 0;
+        try{
+            courseID = Integer.parseInt(db.fetchSingle("SELECT KURS_ID FROM KURS WHERE KURSNAMN ='" + courseName + "'"));
+            System.out.println( "Course id: " + courseID);
+        }
+        catch(InfException e){
+            System.out.println(e);
+        }
+        return courseID;
+    }
+    //Hämtar alla lärare på skolan, returnerar lärarna som en ArrayList
+    public static ArrayList<HashMap<String,String>> getAllTeacherList(InfDB db) {
+        ArrayList<HashMap<String,String>> teacherlist = null;
+        try {
+             teacherlist = db.fetchRows("SELECT * FROM LARARE");
+        } catch(InfException e) {
+            System.out.println(e);
+        }
+        return teacherlist;
     }
 }
