@@ -1,0 +1,183 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Classes;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import oru.inf.InfDB;
+import oru.inf.InfException;
+
+/**
+ *
+ * @author Kasper
+ */
+public class Validate {
+
+    
+    //Kollar om ett textfält är tomt, returnerar true om textfältet är tomt
+    public static boolean isEmpty(JTextField textfield) {
+        boolean empty = false;
+        if(textfield.getText().trim().isEmpty()) {
+            textfield.requestFocus();
+            empty = true;
+        }
+        return empty;
+    }
+    //Kollar om en sträng innehåller en eller flera siffror, returnerar true om strängen innehåller siffror
+    public static boolean isNumeric(String st) {
+        boolean numeric = false;
+        
+        try {
+            int d = Integer.parseInt(st);
+            numeric = true;
+        } 
+        catch(NumberFormatException | NullPointerException nfe){
+            System.out.println(nfe);
+        }
+        return numeric;
+    }
+    //Kollar om en char[] är tom, returnerar true om char[] är tom
+    public static boolean passIsEmpty(char[] pass){
+        boolean empty = false;
+        
+        String passW = "";
+        for(char character : pass){
+            passW += character;
+        }
+        if(passW.trim().isEmpty()){
+            empty = true;
+        }
+        return empty;
+    }
+    //Kollar om ett textfält innehåller en eller flera siffror, returnerar true om textfältet innehåller siffror
+    public static boolean textIsInt(JTextField textfield){
+        try {
+            int sum = Integer.parseInt(textfield.getText());
+        } catch(Exception exc) {
+            System.out.println("Text is int");
+            textfield.setText("");
+            textfield.requestFocus();
+            return false;
+        }
+        
+        return true;
+    }
+    //Kollar om det angivna lösenordet är rätt genom att jämföra med databasen med hjälp av ett id, returnerar true om lösenordet är korrekt
+    public static boolean isPasswordcorrect(InfDB db, JPasswordField pfield, int id){
+        boolean correct = false;
+        try{
+            char [] pass = db.fetchSingle("SELECT LOSENORD FROM LARARE WHERE LARAR_ID = "+ id).toCharArray();
+            if(Arrays.equals(pfield.getPassword(), pass)){
+               correct = true; 
+            }
+            else{
+                System.out.println("Password is wrong");
+            }
+            
+        }
+        catch(Exception e){
+            
+        }
+        return correct;
+    }
+    //Jämför två stycken char[], returnerar true om char[] är likadana
+    public static boolean comparePassword(char[] pass1, char[] pass2){
+        boolean same = false;
+        if(Arrays.equals(pass1, pass2)){
+            same = true;
+        }
+        return same;
+    }
+    //Kollar om en lärare är admin, returnerar true om läraren är admin
+    public static boolean isAdmin(InfDB db, String firstname, String surname){
+        String admin = "";
+        boolean isAdmin = false;
+        try{
+            admin = db.fetchSingle("SELECT ADMINISTRATOR FROM LARARE WHERE FORNAMN ='" + firstname + "' AND EFTERNAMN ='" + surname + "'");
+        
+            if(admin.equals("T")){
+                isAdmin = true;
+            }
+            else if (admin.equals("F")){
+                isAdmin = false;
+            }
+        }
+        catch(InfException e){
+            System.out.println("Error in isAdmin");
+        }
+        return isAdmin;
+    }
+    //Kollar om en elev har betyg i ett angivet ämne, returnerar true om eleven har betyg i angivet ämne
+    public static boolean hasGrade(InfDB db, String firstname, String surname, String coursename){
+        int courseId = 0;
+        int studentId = 0;
+        HashMap<String,String> kurs;
+        boolean exist = false;
+        
+        try{
+            studentId = Integer.parseInt(db.fetchSingle("SELECT ELEV_ID FROM ELEV WHERE FORNAMN = '" + firstname + "' AND EFTERNAMN = '" + surname + "'"));
+            courseId = Integer.parseInt(db.fetchSingle("SELECT KURS_ID FROM KURS WHERE KURSNAMN = '" + coursename + "'"));
+            kurs = db.fetchRow("SELECT HAR_BETYG_I.KURS_ID, HAR_BETYG_I.ELEV_ID, KURSBETYG FROM HAR_BETYG_I WHERE KURS_ID = " + courseId + " AND ELEV_ID"
+                    + " = " + studentId);
+            
+            if(kurs != null){
+                exist = true;
+            }
+        }
+        catch(InfException e){
+            System.out.println(e);
+        }
+        return exist;
+    }
+    //Försöker logga in med en char[] som lösenord och id från ett textfield, returnerar true om lösenordet är rätt för det angivna id:et
+    public static boolean attemptToLogin(InfDB db, char[] pass, JTextField tField) {
+        boolean login = false;
+        int id = Integer.parseInt(tField.getText());
+        try {
+            
+            HashMap<String,String> teacher = db.fetchRow("SELECT * FROM LARARE WHERE LARAR_ID = '" + id + "'");
+            if(Validate.textIsInt(tField)){
+                if(Integer.parseInt(teacher.get("LARAR_ID")) == id){
+                    if(Arrays.equals(teacher.get("LOSENORD").toCharArray(), pass) ){
+                        System.out.println("LOGGED IN with ID:" + id);
+                        login = true;
+                        
+                    }
+                }
+                   
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Var god ange ett lärar-id.");
+            }
+            
+        }
+        catch(InfException e) {
+            //Antagligen ogiltigt användarnamn
+            System.out.println("e");
+        }
+        return login;
+    }
+    //Kollar om ett lärar-id existerar, returnerar true om det angivna id:et finns
+    public static boolean teacherIdExist(InfDB db, int id, ArrayList<HashMap<String,String>> list){
+        boolean exist = false;
+        try{
+            for(HashMap<String,String> teacher : list){
+                if(Integer.parseInt(teacher.get("LARAR_ID")) == id){
+                    exist = true;
+                }
+            }
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        return exist;
+    }
+    
+}
